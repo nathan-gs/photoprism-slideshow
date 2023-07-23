@@ -69,7 +69,7 @@
           config = with lib; mkIf cfg.enable {
             systemd.services.photoprism-slideshow = {
               enable = true;
-              path = [ pkgs.jre_minimal ];
+              path = [ pkgs.jre ];
               environment = {
                 SERVER_PORT = toString cfg.port;
                 DATABASE = cfg.database;
