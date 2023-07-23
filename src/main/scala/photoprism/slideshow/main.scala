@@ -2,65 +2,85 @@ package photoprism.slideshow
 
 import simplesql as sq
 import photoprism.slideshow.domain._
+import scalatags.Text.all._
 
 
 object PhotoprismSlideshowApp extends cask.MainRoutes{
+
+  val db = scala.util.Properties.envOrElse("DATABASE", "./index.db")
+  val basePath = scala.util.Properties.envOrElse("BASE_PATH", "")
+
   val ds: javax.sql.DataSource = {
       val ds = org.sqlite.SQLiteDataSource()
-      ds.setUrl("jdbc:sqlite:./index.db")
+      ds.setUrl(s"jdbc:sqlite:$db")
       ds
   }
 
-  def asJson[T:upickle.default.Writer](a: T) = {
-    cask.Response(upickle.default.write(a), headers = Seq("Content-Type" -> "application/json"))
-  }
-
-  @cask.get("/")
-  def index() = cask.Redirect("/static/index.html")
-
-
-  @cask.staticFiles("/static")
-  def static() = "src/main/resources/"
-
-  @cask.get("/albums")
-  def albums() = {
+  @cask.get(s"$basePath/random/:categories")
+  def random(categories: String) = {
+    
+    // Ugly hack for IN condition
+    val categoriesList = categories.split(",").map(_.trim).filter(_.nonEmpty).toList
+    val input = (0 to 4).map(i => categoriesList.lift(i).getOrElse("TO_BE_IGNORED"))
+    
+    
     sq.transaction(ds){
-      val l = sq.read[Album](sql"""
-          select album_uid, album_title, album_type, album_category 
-          from albums 
-          WHERE 
-          album_type = 'album' AND album_category = 'Travel' 
-          ORDER BY album_title ASC""")
-      asJson(l)
-    }
-  }
-
-  @cask.get("/photos/:albumUid")
-  def photos(albumUid: String) = {
-    sq.transaction(ds){
-      asJson(sq.read[Photo](sql"""
-          select p.photo_uid, p.photo_title, p.photo_type, f.file_hash
+      val photo = sq.read[Photo](sql"""
+          select p.photo_uid, p.photo_title, p.photo_type, f.file_hash, p.taken_at
           from files f
           INNER JOIN photos p ON p.photo_uid = f.photo_uid
           INNER JOIN photos_albums pa ON pa.photo_uid = p.photo_uid
-          WHERE pa.album_uid = ${albumUid} AND p.photo_type = 'image'                
-          """))
+          INNER JOIN albums a ON a.album_uid = pa.album_uid
+          WHERE a.album_type = 'album' 
+          AND a.album_category IN (${input(0)}, ${input(1)}, ${input(2)}, ${input(3)}, ${input(4)}) 
+          AND p.photo_type = 'image'        
+          ORDER BY RANDOM() LIMIT 1""").headOption.getOrElse(Photo("INVALID_PHOTO","INVALID PHOTO","","",""))
+      cask.Response(
+        doctype("html")(
+          html(
+            head(
+              tag("title")(s"${photo.title} - Photoprism Slideshow"),
+              tag("style")(raw(s"""
+                body {
+                  margin: 0;
+                  padding: 0;
+                  background-color: grey;
+                  background-image: url("/api/v1/t/${photo.fileHash}/slideshow/fit_1920/");
+                  background-position: center;
+                }           
+                #title {
+                  position: absolute;
+                  bottom: 0;
+                  left: 0;
+                  right: 0;
+                  color: white;
+                  padding: 1em;
+                  font-family: sans-serif;
+                }   
+                """)),
+              meta(name:="viewport", content:="width=device-width, initial-scale=1"),
+              meta(name:="redirect", content:=s"30; url=${basePath}/random/${categories}", httpEquiv:="refresh"),
+            ),
+            body(
+              div(id:="title")(
+                h1(photo.title),
+                p(photo.takenAt)
+              )
+            )
+          )
+        ),
+        headers = Seq("Content-Type" -> "text/html")
+      )
     }
-  }
-
-  @cask.post("/do-thing")
-  def doThing(request: cask.Request) = {
-    request.text().reverse
-  }
-
-  @cask.get("/do-thing2")
-  def doThing2(request: cask.Request) = {
-    request.text().reverse
   }
 
   override def debugMode = true
 
   override def host = "0.0.0.0"
+
+  override def port = scala.util.Properties.envOrElse("SERVER_PORT", "8080").toInt
+
+  override def log = cask.util.Logger.Console()
 
   initialize()
 }

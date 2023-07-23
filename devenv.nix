@@ -9,6 +9,7 @@
 
   # https://devenv.sh/scripts/
   scripts.m.exec = "mill --no-server $@";
+  scripts.assembly.exec = "m assembly && mv out/assembly.dest/out.jar photoprism-slideshow.jar";
 
   enterShell = ''
     

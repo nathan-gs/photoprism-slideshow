@@ -8,6 +8,7 @@ object PhotoprismSlideshowModule extends RootModule with ScalaModule {
     ivy"com.lihaoyi::cask:0.9.1",
     ivy"io.crashbox::simplesql:0.2.2",
     ivy"org.xerial:sqlite-jdbc:3.42.0.0",
+    ivy"com.lihaoyi::scalatags:0.12.0"
   )
 
   object test extends ScalaTests with TestModule.Utest{
