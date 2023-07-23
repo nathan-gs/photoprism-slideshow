@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>test</title>
+  </head>
+  <body>
+    <h1>test</h1>
+  </body>
+
+  <script>
+    const userAction = async () => {
+  const response = await fetch('/albums');
+  const myJson = await response.json(); //extract JSON from the http response
+  // do something with myJson
+  console.log(myJson)
+    }
+    userAction()
+  </script>
+</html>

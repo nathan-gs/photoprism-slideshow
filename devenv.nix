@@ -5,14 +5,16 @@
   env.GREET = "devenv";
 
   # https://devenv.sh/packages/
-  packages = [ pkgs.git pkgs.sbt ];
+  packages = [ pkgs.git pkgs.mill ];
 
   # https://devenv.sh/scripts/
-  scripts.sbt-run.exec = "sbt run";
+  scripts.m.exec = "mill --no-server $@";
 
   enterShell = ''
-    sbt-run
+    
   '';
+
+  processes.run.exec = "m -w runBackground";
 
   # https://devenv.sh/languages/
   # languages.nix.enable = true;
