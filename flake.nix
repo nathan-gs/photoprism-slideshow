@@ -71,7 +71,7 @@
               enable = true;
               path = [ pkgs.jre_minimal ];
               environment = {
-                SERVER_PORT = cfg.port;
+                SERVER_PORT = toString cfg.port;
                 DATABASE = cfg.database;
                 BASE_PATH = cfg.basePath;
               };
