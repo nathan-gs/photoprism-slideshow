@@ -47,6 +47,7 @@ object PhotoprismSlideshowApp extends cask.MainRoutes{
                   background-color: grey;
                   background-image: url("/api/v1/t/${photo.fileHash}/slideshow/fit_1920/");
                   background-position: center;
+                  background-repeat: no-repeat;
                 }           
                 #title {
                   position: absolute;
