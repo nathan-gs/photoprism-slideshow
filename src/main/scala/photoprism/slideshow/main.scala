@@ -45,9 +45,8 @@ object PhotoprismSlideshowApp extends cask.MainRoutes{
                   margin: 0;
                   padding: 0;
                   background-color: grey;
-                  background-image: url("/api/v1/t/${photo.fileHash}/slideshow/fit_1920/");
-                  background-position: top;
-                  background-repeat: no-repeat;
+                  background: url("/api/v1/t/${photo.fileHash}/slideshow/fit_1920/") no-repeat top center fixed;
+                  background-size: contain;
                 }           
                 #title {
                   position: absolute;
@@ -70,7 +69,7 @@ object PhotoprismSlideshowApp extends cask.MainRoutes{
             )
           )
         ),
-        headers = Seq("Content-Type" -> "text/html")
+        headers = Seq("Content-Type" -> "text/html; charset=UTF-8")
       )
     }
   }
