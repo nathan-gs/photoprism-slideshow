@@ -44,8 +44,7 @@ object PhotoprismSlideshowApp extends cask.MainRoutes{
                 body {
                   margin: 0;
                   padding: 0;
-                  background-color: grey;
-                  background: url("/api/v1/t/${photo.fileHash}/slideshow/fit_1920/") no-repeat top center fixed;
+                  background: url("/api/v1/t/${photo.fileHash}/slideshow/fit_1920/") no-repeat top center fixed grey;
                   background-size: contain;
                 }           
                 #title {

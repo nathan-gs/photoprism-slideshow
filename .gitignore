@@ -8,3 +8,4 @@ target/
 index.db
 out/
 *.log
+.bsp/sbt.json

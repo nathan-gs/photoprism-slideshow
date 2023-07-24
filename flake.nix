@@ -3,9 +3,12 @@
     nixpkgs.url = "nixpkgs/nixos-23.05";    
     flake-compat = { url = "github:edolstra/flake-compat"; flake = false; };
     flake-utils.url = "github:numtide/flake-utils";
+    sbt.url = "github:zaninime/sbt-derivation/master";
+    # recommended for first style of usage documented below, but not necessary
+    sbt.inputs.nixpkgs.follows = "nixpkgs";
   };
 
-  outputs = inputs@{ self, nixpkgs, flake-utils, flake-compat }:
+  outputs = inputs@{ self, nixpkgs, flake-utils, flake-compat, sbt }:
     flake-utils.lib.eachDefaultSystem
       (
         system:
@@ -13,7 +16,7 @@
           pkgs = import nixpkgs
             {
               inherit system; overlays = [
-              self.overlay              
+              self.overlays.default              
             ];
               config = {
                 allowUnsupportedSystem = true;
@@ -23,10 +26,10 @@
         with pkgs;
         rec {
           packages = flake-utils.lib.flattenTree {
-            photoprism-slideshow = pkgs.photoprism-slideshow;
+            inherit (pkgs)
+              photoprism-slideshow;
+            default = pkgs.photoprism-slideshow;
           };
-
-          #defaultPackage = packages.photoprism-slideshow;
 
           checks.build = packages.photoprism-slideshow;
           
@@ -84,15 +87,26 @@
           };
         };
 
-      overlay = final: prev: {
+      overlays.default = final: prev: {
         photoprism-slideshow = with final;
           (
-            stdenv.mkDerivation {
-              name = "photoprism-slideshow";
-              buildInputs = [];
+            sbt.lib.mkSbtDerivation {
+              pname = "photoprism-slideshow";
+              version = "0.0.1";
+              pkgs = nixpkgs.legacyPackages.x86_64-linux;
+              depsSha256 = "sha256-iBt8aH+0AcbhW4AuhCIurDMV6xqq/iP9+LABq+DuoEI=";
+              buildInputs = [ ];
               src = self;
-              buildPhase = "";
-              installPhase = "mkdir -p $out; cp *.jar $out/";
+              #buildPhase = "";
+              buildPhase = ''
+                sbt package
+              '';
+
+              #installPhase = "mkdir -p $out; cp *.jar $out/";
+              installPhase = ''
+                find -type f -name "*.jar" -exec cp {} $out \;
+              '';
+
             }
           );
         

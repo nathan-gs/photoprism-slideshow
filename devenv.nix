@@ -5,17 +5,17 @@
   env.GREET = "devenv";
 
   # https://devenv.sh/packages/
-  packages = [ pkgs.git pkgs.mill ];
+  packages = [ pkgs.git pkgs.sbt ];
 
   # https://devenv.sh/scripts/
-  scripts.m.exec = "mill --no-server $@";
-  scripts.assembly.exec = "m assembly && mv out/assembly.dest/out.jar photoprism-slideshow.jar";
+  #scripts.m.exec = "mill --no-server $@";
+  #scripts.assembly.exec = "m assembly && mv out/assembly.dest/out.jar photoprism-slideshow.jar";
 
   enterShell = ''
     
   '';
 
-  processes.run.exec = "m -w runBackground";
+  #processes.run.exec = "m -w runBackground";
 
   # https://devenv.sh/languages/
   # languages.nix.enable = true;
