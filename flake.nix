@@ -97,15 +97,12 @@
               depsSha256 = "sha256-iBt8aH+0AcbhW4AuhCIurDMV6xqq/iP9+LABq+DuoEI=";
               buildInputs = [ ];
               src = self;
-              #buildPhase = "";
+              nativeBuildInputs = [ ];
               buildPhase = ''
                 sbt package
               '';
 
-              #installPhase = "mkdir -p $out; cp *.jar $out/";
-              installPhase = ''
-                find -type f -name "*.jar" -exec cp {} $out \;
-              '';
+              installPhase = "mkdir -p $out; cp target/scala-*/*.jar $out/photoprism-slideshow.jar";
 
             }
           );
