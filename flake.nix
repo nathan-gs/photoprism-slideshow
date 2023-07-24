@@ -94,15 +94,17 @@
               pname = "photoprism-slideshow";
               version = "0.0.1";
               pkgs = nixpkgs.legacyPackages.x86_64-linux;
-              depsSha256 = "sha256-iBt8aH+0AcbhW4AuhCIurDMV6xqq/iP9+LABq+DuoEI=";
+              depsSha256 = "sha256-nH5Ppa7/t4D1nePni4V2msPi+aoriz5V+b6/+pjoCy0=";
+              
               buildInputs = [ ];
               src = self;
               nativeBuildInputs = [ ];
+              
               buildPhase = ''
-                sbt package
+                sbt assembly
               '';
 
-              installPhase = "mkdir -p $out; cp target/scala-*/*.jar $out/photoprism-slideshow.jar";
+              installPhase = "mkdir -p $out; cp target/scala-*/photoprism-slideshow-assembly-*.jar $out/photoprism-slideshow.jar";
 
             }
           );
