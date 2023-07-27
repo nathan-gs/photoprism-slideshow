@@ -101,9 +101,9 @@
         DeviceAllow = false;
         DevicePolicy = "closed";
         LockPersonality = true;
-        MemoryDenyWriteExecute = false;
+        MemoryDenyWriteExecute = true;
         NoNewPrivileges = true;
-        PrivateDevices = usesDev;
+        PrivateDevices = true;
         PrivateUsers = true;
         PrivateTmp = true;
         ProtectClock = true;
