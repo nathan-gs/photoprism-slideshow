@@ -82,4 +82,5 @@ object PhotoprismSlideshowApp extends cask.MainRoutes{
   override def log = cask.util.Logger.Console()
 
   initialize()
+  
 }
