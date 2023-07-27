@@ -91,47 +91,47 @@
             java -jar ${cfg.package}/photoprism-slideshow.jar
           '';
           wantedBy = [ "multi-user.target" ];
-      after = [ "network.target" ];
-      serviceConfig = {
-        DynamicUser = true;
-        Restart = "on-failure";
-        CacheDirectory = "photoprism-slideshow";
-        # Hardening
-        CapabilityBoundingSet = "";
-        DeviceAllow = false;
-        DevicePolicy = "closed";
-        LockPersonality = true;
-        MemoryDenyWriteExecute = true;
-        NoNewPrivileges = true;
-        PrivateDevices = true;
-        PrivateUsers = true;
-        PrivateTmp = true;
-        ProtectClock = true;
-        ProtectControlGroups = true;
-        ProtectHome = true;
-        ProtectHostname = true;
-        ProtectKernelLogs = true;
-        ProtectKernelModules = true;
-        ProtectKernelTunables = true;
-        ProtectProc = "invisible";
-        ProcSubset = "pid";
-        ProtectSystem = "strict";
-        RemoveIPC = true;
-        RestrictAddressFamilies = [
-          "AF_INET"
-          "AF_INET6"
-        ];
-        RestrictNamespaces = true;
-        RestrictRealtime = true;
-        RestrictSUIDSGID = true;
-        SupplementaryGroups = [];
-        SystemCallArchitectures = "native";
-        SystemCallFilter = [
-          "@system-service @pkey"
-          "~@privileged @resources"
-        ];
-        UMask = "0077";
-      };
+          after = [ "network.target" ];
+          serviceConfig = {
+            DynamicUser = true;
+            Restart = "on-failure";
+            CacheDirectory = "photoprism-slideshow";
+            # Hardening
+            CapabilityBoundingSet = "";
+            DeviceAllow = false;
+            DevicePolicy = "closed";
+            LockPersonality = true;
+            MemoryDenyWriteExecute = false;
+            NoNewPrivileges = true;
+            PrivateDevices = true;
+            PrivateUsers = true;
+            PrivateTmp = true;
+            ProtectClock = true;
+            ProtectControlGroups = true;
+            ProtectHome = true;
+            ProtectHostname = true;
+            ProtectKernelLogs = true;
+            ProtectKernelModules = true;
+            ProtectKernelTunables = true;
+            ProtectProc = "invisible";
+            ProcSubset = "pid";
+            ProtectSystem = "strict";
+            RemoveIPC = true;
+            RestrictAddressFamilies = [
+              "AF_INET"
+              "AF_INET6"
+            ];
+            RestrictNamespaces = true;
+            RestrictRealtime = true;
+            RestrictSUIDSGID = true;
+            SupplementaryGroups = [];
+            SystemCallArchitectures = "native";
+            SystemCallFilter = [
+              "@system-service @pkey"
+              "~@privileged @resources"
+            ];
+            UMask = "0077";
+          };
         };
       };
     };
