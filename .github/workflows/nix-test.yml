@@ -1,0 +1,15 @@
+name: "Nix Test"
+on:
+  pull_request:
+  push:
+jobs:
+  tests:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+    - uses: cachix/install-nix-action@v17
+      with:
+        nix_path: nixpkgs=channel:nixos-23.05
+    - uses: workflow/nix-shell-action@v3
+      with:
+        script: nix flake check
