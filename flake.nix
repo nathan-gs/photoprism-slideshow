@@ -64,14 +64,13 @@
       };
 
       config = with lib; mkIf cfg.enable {
-
       
-        systemd.timers.photoprism-slideshow = {
-          enable = cfg.preload;
-          timerConfig = {
-            OnCalendar = "*-*-* *:08:00";
-            Unit = "photoprism-slideshow.service";
-          };
+        systemd.services.photoprism-slideshow-reload = mkIf cfg.preload {
+          enable = true;
+          startAt = "*-*-* 01:34:00";
+          script = ''
+            ${pkgs.systemd}/bin/systemctl reload photoprism-slideshow
+          '';
         };
         
 
@@ -79,11 +78,13 @@
           enable = true;
           path = [ pkgs.jre ];
           preStart = if cfg.preload then ''
-            ${pkgs.sqlite}/bin/sqlite3 ${cfg.database} ".clone /var/cache/photoprism-slideshow/index.db"
+            cd /var/cache/photoprism-slideshow
+            [ -e photoprism-slideshow.db ] && rm -- photoprism-slideshow.db
+            ${pkgs.sqlite}/bin/sqlite3 ${cfg.database} ".clone photoprism-slideshow.db"
           '' else "";
           environment = {
             SERVER_PORT = toString cfg.port;
-            DATABASE = if cfg.preload then "/var/cache/photoprism-slideshow/index.db" else cfg.database;
+            DATABASE = if cfg.preload then "/var/cache/photoprism-slideshow/photoprism-slideshow.db" else cfg.database;
             BASE_PATH = cfg.basePath;
           };
 
