@@ -36,6 +36,11 @@
             default = false;
           };
 
+          preload = mkOption {
+            type = types.bool;
+            default = false;
+          };
+
           port = mkOption {
             type = types.int;
             default = 23234;
@@ -59,17 +64,74 @@
       };
 
       config = with lib; mkIf cfg.enable {
+
+      
+        systemd.timers.photoprism-slideshow = {
+          enable = cfg.preload;
+          timerConfig = {
+            OnCalendar = "*-*-* *:08:00";
+            Unit = "photoprism-slideshow.service";
+          };
+        };
+        
+
         systemd.services.photoprism-slideshow = {
           enable = true;
           path = [ pkgs.jre ];
+          preStart = lib.optionals cfg.preload ''
+            ${pkgs.sqlite}/bin/sqlite3 ${cfg.database} ".clone /var/cache/photoprism-slideshow/index.db"
+          '';
           environment = {
             SERVER_PORT = toString cfg.port;
-            DATABASE = cfg.database;
+            DATABASE = if cfg.preload then "/var/cache/photoprism-slideshow/index.db" else cfg.database;
             BASE_PATH = cfg.basePath;
           };
+
           script = ''
             java -jar ${cfg.package}/photoprism-slideshow.jar
           '';
+          wantedBy = [ "multi-user.target" ];
+      after = [ "network.target" ];
+      serviceConfig = {
+        DynamicUser = true;
+        Restart = "on-failure";
+        CacheDirectory = "photoprism-slideshow";
+        # Hardening
+        CapabilityBoundingSet = "";
+        DeviceAllow = false;
+        DevicePolicy = "closed";
+        LockPersonality = true;
+        MemoryDenyWriteExecute = false;
+        NoNewPrivileges = true;
+        PrivateDevices = usesDev;
+        PrivateUsers = true;
+        PrivateTmp = true;
+        ProtectClock = true;
+        ProtectControlGroups = true;
+        ProtectHome = true;
+        ProtectHostname = true;
+        ProtectKernelLogs = true;
+        ProtectKernelModules = true;
+        ProtectKernelTunables = true;
+        ProtectProc = "invisible";
+        ProcSubset = "pid";
+        ProtectSystem = "strict";
+        RemoveIPC = true;
+        RestrictAddressFamilies = [
+          "AF_INET"
+          "AF_INET6"
+        ];
+        RestrictNamespaces = true;
+        RestrictRealtime = true;
+        RestrictSUIDSGID = true;
+        SupplementaryGroups = [];
+        SystemCallArchitectures = "native";
+        SystemCallFilter = [
+          "@system-service @pkey"
+          "~@privileged @resources"
+        ];
+        UMask = "0077";
+      };
         };
       };
     };
