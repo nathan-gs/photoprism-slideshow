@@ -76,15 +76,12 @@ object PhotoprismSlideshowApp extends cask.MainRoutes{
               document.addEventListener('click', function enableNoSleepAndFullScreen() {
                 //document.removeEventListener('click', enableNoSleep, false);
                 noSleep.enable();
-                var requestMethod = element.requestFullScreen || element.webkitRequestFullScreen || element.mozRequestFullScreen || element.msRequestFullScreen;                
-                requestMethod.call(element);                
+                function requestFullScreen(element) {
+                  var requestMethod = element.requestFullScreen || element.webkitRequestFullScreen || element.mozRequestFullScreen || element.msRequestFullScreen;                
+                  requestMethod.call(element);                
+                }
                 requestFullScreen(document.body);
               }, false);
-
-              function requestFullScreen(element) {
-                // Supports most browsers and their versions.
-              }
-
             """))
             
           )
