@@ -78,9 +78,9 @@
         systemd.services.photoprism-slideshow = {
           enable = true;
           path = [ pkgs.jre ];
-          preStart = lib.optionals cfg.preload ''
+          preStart = if cfg.preload then ''
             ${pkgs.sqlite}/bin/sqlite3 ${cfg.database} ".clone /var/cache/photoprism-slideshow/index.db"
-          '';
+          '' else "";
           environment = {
             SERVER_PORT = toString cfg.port;
             DATABASE = if cfg.preload then "/var/cache/photoprism-slideshow/index.db" else cfg.database;
