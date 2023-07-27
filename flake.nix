@@ -69,7 +69,7 @@
           enable = true;
           startAt = "*-*-* 01:34:00";
           script = ''
-            ${pkgs.systemd}/bin/systemctl reload photoprism-slideshow
+            ${pkgs.systemd}/bin/systemctl restart photoprism-slideshow
           '';
         };
         
@@ -99,7 +99,7 @@
             CacheDirectory = "photoprism-slideshow";
             # Hardening
             CapabilityBoundingSet = "";
-            DeviceAllow = false;
+            DeviceAllow = "";
             DevicePolicy = "closed";
             LockPersonality = true;
             MemoryDenyWriteExecute = false;
