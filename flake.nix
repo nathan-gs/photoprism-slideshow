@@ -53,7 +53,7 @@
 
           package = mkOption {
             type = types.package;
-            default = self.outputs.packages."${pkgs.system}".photoprism-slideshow;
+            default = self.outputs.packages."${pkgs.system}".default;
           };              
         };
       };
