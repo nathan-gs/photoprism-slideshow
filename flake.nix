@@ -76,7 +76,7 @@
 
         systemd.services.photoprism-slideshow = {
           enable = true;
-          path = [ pkgs.jre ];
+          path = [ ];
           preStart = if cfg.preload then ''
             cd /var/cache/photoprism-slideshow
             [ -e photoprism-slideshow.db ] && rm -- photoprism-slideshow.db
@@ -89,7 +89,7 @@
           };
 
           script = ''
-            java -jar ${cfg.package}/photoprism-slideshow.jar
+           ${cfg.package}/bin/photoprism-slideshow
           '';
           wantedBy = [ "multi-user.target" ];
           after = [ "network.target" ];

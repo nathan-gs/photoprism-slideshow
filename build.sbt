@@ -10,3 +10,5 @@ libraryDependencies ++=  Seq(
   "org.xerial" % "sqlite-jdbc" % "3.42.0.0",
   "com.lihaoyi" %% "scalatags" % "0.12.0"
 )
+
+enablePlugins(JavaAppPackaging)

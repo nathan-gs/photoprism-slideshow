@@ -6,16 +6,36 @@ sbt.lib.mkSbtDerivation {
   pname = "photoprism-slideshow";
   version = "0.0.1";
 
-  depsSha256 = "sha256-nH5Ppa7/t4D1nePni4V2msPi+aoriz5V+b6/+pjoCy0=";
+  depsSha256 = "sha256-qwtUYKy51TFA/q/Yd2bwzrPSkA/Xjrsbb8ftQf/0PlM=";
   
   buildInputs = [ ];
   src = self;
   nativeBuildInputs = [ ];
   
-  buildPhase = ''
-    sbt assembly
+  depsWarmupCommand = ''
+    sbt 'managedClasspath; compilers'
   '';
 
-  installPhase = "mkdir -p $out; cp target/scala-*/photoprism-slideshow-assembly-*.jar $out/photoprism-slideshow.jar";
+  startScript = ''
+    #!${pkgs.runtimeShell}
+
+    exec ${pkgs.openjdk_headless}/bin/java ''${JAVA_OPTS:-} -cp "${
+      placeholder "out"
+    }/share/photoprism-slideshow/lib/*" photoprism.slideshow.PhotoprismSlideshowApp "$@"
+  '';
+
+  buildPhase = ''
+    sbt stage
+  '';
+
+  installPhase = ''
+    libs_dir="$out/share/photoprism-slideshow/lib"
+    mkdir -p "$libs_dir"
+    cp -ar target/universal/stage/lib/. "$libs_dir"
+
+    install -T -D -m755 $startScriptPath $out/bin/photoprism-slideshow
+  '';
+
+  passAsFile = ["startScript"];
 
 }
