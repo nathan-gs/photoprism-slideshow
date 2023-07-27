@@ -74,7 +74,7 @@ object PhotoprismSlideshowApp extends cask.MainRoutes{
               }
               var noSleep = new NoSleep();
               document.addEventListener('click', function enableNoSleepAndFullScreen() {
-                document.removeEventListener('click', enableNoSleep, false);
+                //document.removeEventListener('click', enableNoSleep, false);
                 noSleep.enable();
                 var requestMethod = element.requestFullScreen || element.webkitRequestFullScreen || element.mozRequestFullScreen || element.msRequestFullScreen;                
                 requestMethod.call(element);                
