@@ -73,19 +73,18 @@ object PhotoprismSlideshowApp extends cask.MainRoutes{
                 });
               }
               var noSleep = new NoSleep();
-              document.addEventListener('click', function enableNoSleep() {
+              document.addEventListener('click', function enableNoSleepAndFullScreen() {
                 document.removeEventListener('click', enableNoSleep, false);
                 noSleep.enable();
+                var requestMethod = element.requestFullScreen || element.webkitRequestFullScreen || element.mozRequestFullScreen || element.msRequestFullScreen;                
+                requestMethod.call(element);                
+                requestFullScreen(document.body);
               }, false);
 
               function requestFullScreen(element) {
                 // Supports most browsers and their versions.
-                var requestMethod = element.requestFullScreen || element.webkitRequestFullScreen || element.mozRequestFullScreen || element.msRequestFullScreen;                
-                requestMethod.call(element);                
               }
 
-              var elem = document.body; // Make the body go full screen.
-              requestFullScreen(elem);
             """))
             
           )
