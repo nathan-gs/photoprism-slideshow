@@ -24,26 +24,33 @@ object PhotoprismSlideshowApp extends cask.MainRoutes{
           head(
             tag("title")(s"Photoprism Slideshow"),
             tag("style")(raw(s"""
-              body {
+              body, html {
                 margin: 0;
                 padding: 0;
+                height: 100%;
+                overflow: hidden;
+              }         
+              #photo {
                 background: url("empty.png") no-repeat top center fixed grey;
+                height: 100%;
                 background-size: contain;
-              }           
+              }  
               #box {
-                position: absolute;
-                bottom: 0;
-                left: 0;
+                position: fixed;
+                bottom: 10px;
+                left: 10px;
                 right: 0;
                 color: white;
                 padding: 1em;
                 font-family: sans-serif;
+                z-index: 1000;
               }   
               """)),
             meta(name:="viewport", content:="width=device-width, initial-scale=1"),
             script(src:="https://cdnjs.cloudflare.com/ajax/libs/nosleep/0.12.0/NoSleep.min.js")
           ),
           body(
+            div(id:="photo"),
             div(id:="box")(
               h1(id:="title","test"),
               p(id:="ts","test")
@@ -64,7 +71,7 @@ object PhotoprismSlideshowApp extends cask.MainRoutes{
                     document.getElementById('title').innerText = data.title;
                     document.getElementsByTagName('title')[0].innerText = data.title;
                     document.getElementById('ts').innerText = data.taken_at;
-                    document.body.style.backgroundImage = "url(\\"" + data.photo + "\\")";
+                    document.getElementById('photo').style.backgroundImage = "url(\\"" + data.photo + "\\")";
 
                   });
                 })
