@@ -38,7 +38,7 @@ object PhotoprismSlideshowApp extends cask.MainRoutes{
               #box {
                 position: absolute;
                 bottom: 10px;
-                left: 10px;
+                left: 150px;
                 right: 0;
                 color: white;
                 padding: 1em;
