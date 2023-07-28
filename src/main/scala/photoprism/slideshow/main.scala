@@ -50,10 +50,11 @@ object PhotoprismSlideshowApp extends cask.MainRoutes{
             script(src:="https://cdnjs.cloudflare.com/ajax/libs/nosleep/0.12.0/NoSleep.min.js")
           ),
           body(
-            div(id:="photo"),
-            div(id:="box")(
-              h1(id:="title","test"),
-              p(id:="ts","test")
+            div(id:="photo")(
+              div(id:="box")(
+                h1(id:="title","test"),
+                p(id:="ts","test")
+              )
             ),
             tag("script")(raw(s"""
               var intervalID = window.setInterval(refreshImage, 10 * 1000);
