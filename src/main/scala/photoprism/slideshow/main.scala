@@ -33,7 +33,14 @@ object PhotoprismSlideshowApp extends cask.MainRoutes{
                 overflow: hidden;
               }         
               #photo {
-                background: url("empty.png") no-repeat top center fixed grey;
+                background-color: grey;
+                background-position-x: center;
+                background-position-y: top;
+                background-repeat: no-repeat;
+                background-attachment: fixed;
+                background-size: auto;
+                background-origin: padding-box;
+                background-clip: border-box;
                 height: 100%;
                 background-size: contain;
               }  
