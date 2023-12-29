@@ -10,6 +10,7 @@ object PhotoprismSlideshowApp extends cask.MainRoutes{
   val db = scala.util.Properties.envOrElse("DATABASE", "./index.db")
   val basePath = scala.util.Properties.envOrElse("BASE_PATH", "")
   val interval = scala.util.Properties.envOrElse("INTERVAL", "10").toInt
+  val photoprismUrl = scala.util.Properties.envOrElse("PHOTOPRISM_URL", "")
 
   val ds: javax.sql.DataSource = {
       val ds = org.sqlite.SQLiteDataSource()
@@ -58,8 +59,7 @@ object PhotoprismSlideshowApp extends cask.MainRoutes{
               )
             ),
             tag("script")(raw(s"""
-              var intervalID = window.setInterval(refreshImage, ${interval} * 1000);
-
+              
               function refreshImage() {
                 fetch('./photo/random/' + location.hash.substr(1))
                 .then(function(response) {
@@ -70,18 +70,24 @@ object PhotoprismSlideshowApp extends cask.MainRoutes{
 
                   // Examine the text in the response
                   response.json().then(function(data) {
-                    (new Image()).src = data.photo;
-                    document.getElementById('title').innerText = data.title;
-                    document.getElementsByTagName('title')[0].innerText = data.title;
-                    document.getElementById('ts').innerText = data.taken_at;
-                    document.getElementById('photo').style.backgroundImage = "url(\\"" + data.photo + "\\")";
-
+                    img = new Image()
+                    
+                    img.onload = function() {
+                      document.getElementById('title').innerText = data.title;
+                      document.getElementsByTagName('title')[0].innerText = data.title;
+                      document.getElementById('ts').innerText = data.taken_at;
+                      document.getElementById('photo').style.backgroundImage = "url(\\"" + data.photo + "\\")";
+                    }
+                    img.src = data.photo;
                   });
                 })
                 .catch(function(err) {
                   console.log('Fetch Error :-S', err);
                 });
               }
+              var intervalID = window.setInterval(refreshImage, ${interval} * 1000);
+              refreshImage();
+
               var noSleep = new NoSleep();
               document.addEventListener('click', function enableNoSleepAndFullScreen() {
                 //document.removeEventListener('click', enableNoSleep, false);
@@ -125,7 +131,7 @@ object PhotoprismSlideshowApp extends cask.MainRoutes{
       cask.Response(
         s"""
         {
-          "photo": "/api/v1/t/${photo.fileHash}/slideshow/fit_1920/",
+          "photo": "${photoprismUrl}/api/v1/t/${photo.fileHash}/slideshow/fit_1920/",
           "title": "${photo.title}",
           "taken_at": "${photo.takenAt}"
         }
@@ -163,7 +169,7 @@ object PhotoprismSlideshowApp extends cask.MainRoutes{
                 body {
                   margin: 0;
                   padding: 0;
-                  background: url("/api/v1/t/${photo.fileHash}/slideshow/fit_1920/") no-repeat top center fixed grey;
+                  background: url("${photoprismUrl}/api/v1/t/${photo.fileHash}/slideshow/fit_1920/") no-repeat top center fixed grey;
                   background-size: contain;
                 }           
                 #title {

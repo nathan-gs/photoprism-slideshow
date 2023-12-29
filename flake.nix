@@ -68,6 +68,11 @@
                 type = types.int;
                 default = 10;
               };
+
+              photoprismUrl = mkOption {
+                type = types.str;
+                default = "";
+              };
             };
           };
 
@@ -96,6 +101,7 @@
                 DATABASE = if cfg.preload then "/var/cache/photoprism-slideshow/photoprism-slideshow.db" else cfg.database;
                 BASE_PATH = cfg.basePath;
                 INTERVAL = toString cfg.interval;
+                PHOTOPRISM_URL = cfg.photoprismUrl;
               };
 
               script = ''

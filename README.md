@@ -4,7 +4,7 @@ A very basic Picture Frame side-app for [Photoprism](https://www.photoprism.app/
 
 Easiest to use with NixOS as a flake, but can be used outside. 
 
-## Usage
+## Installation
 
 In your `flake.nix`:
 
@@ -33,3 +33,12 @@ In your regular config:
 ```
 
 The `preload` option copies your photoprism db at start and every 24h.
+
+## Usage
+
+It uses the photoprism endpoint to retrieve scaled photo's. 
+
+There are 2 endpoints:
+
+- `/#Album1,Album2,AlbumN` using Javascript to automatically advance
+- `/random/Album1,Album2,AlbumN` a plain HTML version
