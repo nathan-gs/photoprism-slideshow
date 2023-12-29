@@ -9,6 +9,7 @@ object PhotoprismSlideshowApp extends cask.MainRoutes{
 
   val db = scala.util.Properties.envOrElse("DATABASE", "./index.db")
   val basePath = scala.util.Properties.envOrElse("BASE_PATH", "")
+  val interval = scala.util.Properties.envOrElse("INTERVAL", "10").toInt
 
   val ds: javax.sql.DataSource = {
       val ds = org.sqlite.SQLiteDataSource()
@@ -57,7 +58,7 @@ object PhotoprismSlideshowApp extends cask.MainRoutes{
               )
             ),
             tag("script")(raw(s"""
-              var intervalID = window.setInterval(refreshImage, 10 * 1000);
+              var intervalID = window.setInterval(refreshImage, ${interval} * 1000);
 
               function refreshImage() {
                 fetch('./photo/random/' + location.hash.substr(1))
@@ -69,6 +70,7 @@ object PhotoprismSlideshowApp extends cask.MainRoutes{
 
                   // Examine the text in the response
                   response.json().then(function(data) {
+                    (new Image()).src = data.photo;
                     document.getElementById('title').innerText = data.title;
                     document.getElementsByTagName('title')[0].innerText = data.title;
                     document.getElementById('ts').innerText = data.taken_at;
@@ -175,7 +177,7 @@ object PhotoprismSlideshowApp extends cask.MainRoutes{
                 }   
                 """)),
               meta(name:="viewport", content:="width=device-width, initial-scale=1"),
-              meta(name:="redirect", content:=s"30; url=${basePath}/random/${categories}", httpEquiv:="refresh"),
+              meta(name:="redirect", content:=s"${interval}; url=${basePath}/random/${categories}", httpEquiv:="refresh"),
             ),
             body(
               div(id:="title")(
