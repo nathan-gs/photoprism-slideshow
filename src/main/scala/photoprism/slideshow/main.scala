@@ -128,7 +128,7 @@ object PhotoprismSlideshowApp extends cask.MainRoutes{
     
     ds.transaction:
       val photo = (sql"""
-          select p.photo_uid, p.photo_title, p.photo_type, f.file_hash, p.taken_at
+          select p.photo_uid as uid, p.photo_title as title, p.photo_type, f.file_hash, p.taken_at
           from files f
           INNER JOIN photos p ON p.photo_uid = f.photo_uid
           INNER JOIN photos_albums pa ON pa.photo_uid = p.photo_uid
@@ -159,7 +159,7 @@ object PhotoprismSlideshowApp extends cask.MainRoutes{
     
     ds.transaction:
       val photo = (sql"""
-          select p.photo_uid, p.photo_title, p.photo_type, f.file_hash, p.taken_at
+          select p.photo_uid as uid, p.photo_title as title, p.photo_type, f.file_hash, p.taken_at
           from files f
           INNER JOIN photos p ON p.photo_uid = f.photo_uid
           INNER JOIN photos_albums pa ON pa.photo_uid = p.photo_uid
