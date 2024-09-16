@@ -123,7 +123,8 @@ object PhotoprismSlideshowApp extends cask.MainRoutes{
   def randomPhoto(categories: String) = {
     
     // Ugly hack for IN condition
-    val categoriesList = categories.split(",").map(_.trim).filter(_.nonEmpty).toList    
+    val categoriesList = categories.split(",").map(_.trim).filter(_.nonEmpty).toList
+    val input = (0 to 6).map(i => categoriesList.lift(i).getOrElse("TO_BE_IGNORED"))   
     
     ds.run:
       val photo = (sql"""
@@ -133,9 +134,9 @@ object PhotoprismSlideshowApp extends cask.MainRoutes{
           INNER JOIN photos_albums pa ON pa.photo_uid = p.photo_uid
           INNER JOIN albums a ON a.album_uid = pa.album_uid
           WHERE a.album_type = 'album' 
-          AND a.album_category IN (${categoriesList.mkString("'", "','", "'")})
+          AND a.album_category IN (${input(0)}, ${input(1)}, ${input(2)}, ${input(3)}, ${input(4)}, ${input(5)}, ${input(6)}) 
           AND p.photo_type = 'image'        
-          ORDER BY ${sqlRandomFunction} LIMIT 1""".read[Photo]).headOption.getOrElse(Photo("INVALID_PHOTO","INVALID PHOTO","","",""))
+          ORDER BY RAND() LIMIT 1""".read[Photo]).headOption.getOrElse(Photo("INVALID_PHOTO","INVALID PHOTO","","",""))
       cask.Response(
         s"""
         {
@@ -153,6 +154,7 @@ object PhotoprismSlideshowApp extends cask.MainRoutes{
     
     // Ugly hack for IN condition
     val categoriesList = categories.split(",").map(_.trim).filter(_.nonEmpty).toList
+    val input = (0 to 6).map(i => categoriesList.lift(i).getOrElse("TO_BE_IGNORED"))   
      
     ds.run:
       val photo = (sql"""
@@ -162,9 +164,9 @@ object PhotoprismSlideshowApp extends cask.MainRoutes{
           INNER JOIN photos_albums pa ON pa.photo_uid = p.photo_uid
           INNER JOIN albums a ON a.album_uid = pa.album_uid
           WHERE a.album_type = 'album' 
-          AND a.album_category IN (${categoriesList.mkString("'", "','", "'")})
+          AND a.album_category IN (${input(0)}, ${input(1)}, ${input(2)}, ${input(3)}, ${input(4)}, ${input(5)}, ${input(6)}) 
           AND p.photo_type = 'image'        
-          ORDER BY ${sqlRandomFunction} LIMIT 1""".read[Photo]).headOption.getOrElse(Photo("INVALID_PHOTO","INVALID PHOTO","","",""))
+          ORDER BY RAND() LIMIT 1""".read[Photo]).headOption.getOrElse(Photo("INVALID_PHOTO","INVALID PHOTO","","",""))
       cask.Response(
         doctype("html")(
           html(
