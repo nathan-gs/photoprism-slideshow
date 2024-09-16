@@ -1,6 +1,6 @@
 {
   inputs = {
-    nixpkgs.url = "nixpkgs/nixos-23.11";
+    nixpkgs.url = "nixpkgs/nixos-24.05";
     flake-utils.url = "github:numtide/flake-utils";
     sbt.url = "github:zaninime/sbt-derivation/master";
     # recommended for first style of usage documented below, but not necessary
@@ -37,21 +37,16 @@
               enable = mkOption {
                 type = types.bool;
                 default = false;
-              };
-
-              preload = mkOption {
-                type = types.bool;
-                default = false;
-              };
+              };             
 
               port = mkOption {
                 type = types.int;
                 default = 23234;
               };
 
-              database = mkOption {
+              dsn = mkOption {
                 type = types.str;
-                default = "/var/lib/photoprism/index.db";
+                default = "jdbc:sqlite:/var/lib/photoprism/index.db";
               };
 
               basePath = mkOption {
@@ -78,27 +73,12 @@
 
           config = with lib; mkIf cfg.enable {
 
-            systemd.services.photoprism-slideshow-reload = mkIf cfg.preload {
-              enable = true;
-              startAt = "*-*-* 01:34:00";
-              script = ''
-                ${pkgs.systemd}/bin/systemctl restart photoprism-slideshow
-              '';
-            };
-
-
             systemd.services.photoprism-slideshow = {
               enable = true;
               path = [ ];
-              preStart =
-                if cfg.preload then ''
-                  cd /var/cache/photoprism-slideshow
-                  [ -e photoprism-slideshow.db ] && rm -- photoprism-slideshow.db
-                  ${pkgs.sqlite}/bin/sqlite3 ${cfg.database} ".clone photoprism-slideshow.db"
-                '' else "";
               environment = {
                 SERVER_PORT = toString cfg.port;
-                DATABASE = if cfg.preload then "/var/cache/photoprism-slideshow/photoprism-slideshow.db" else cfg.database;
+                DSN = cfg.dsn;
                 BASE_PATH = cfg.basePath;
                 INTERVAL = toString cfg.interval;
                 PHOTOPRISM_URL = cfg.photoprismUrl;
@@ -112,7 +92,7 @@
               serviceConfig = {
                 DynamicUser = true;
                 Restart = "on-failure";
-                CacheDirectory = "photoprism-slideshow";
+                CacheDirectory = "";
                 # Hardening
                 CapabilityBoundingSet = "";
                 DeviceAllow = "";

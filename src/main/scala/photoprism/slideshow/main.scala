@@ -7,16 +7,12 @@ import scalatags.Text.all._
 
 object PhotoprismSlideshowApp extends cask.MainRoutes{
 
-  val db = scala.util.Properties.envOrElse("DATABASE", "./index.db")
+  val dsn = scala.util.Properties.envOrElse("DSN", "")
   val basePath = scala.util.Properties.envOrElse("BASE_PATH", "")
   val interval = scala.util.Properties.envOrElse("INTERVAL", "10").toInt
   val photoprismUrl = scala.util.Properties.envOrElse("PHOTOPRISM_URL", "")
 
-  val ds: javax.sql.DataSource = {
-      val ds = org.sqlite.SQLiteDataSource()
-      ds.setUrl(s"jdbc:sqlite:$db")
-      ds
-  }
+  val ds = sq.DataSource.pooled(dsn)
 
   @cask.get(s"$basePath")
   def index() = {
@@ -124,8 +120,8 @@ object PhotoprismSlideshowApp extends cask.MainRoutes{
     val input = (0 to 4).map(i => categoriesList.lift(i).getOrElse("TO_BE_IGNORED"))
     
     
-    sq.transaction(ds){
-      val photo = sq.read[Photo](sql"""
+    ds.transaction:
+      val photo = (sql"""
           select p.photo_uid, p.photo_title, p.photo_type, f.file_hash, p.taken_at
           from files f
           INNER JOIN photos p ON p.photo_uid = f.photo_uid
@@ -134,7 +130,7 @@ object PhotoprismSlideshowApp extends cask.MainRoutes{
           WHERE a.album_type = 'album' 
           AND a.album_category IN (${input(0)}, ${input(1)}, ${input(2)}, ${input(3)}, ${input(4)}) 
           AND p.photo_type = 'image'        
-          ORDER BY RANDOM() LIMIT 1""").headOption.getOrElse(Photo("INVALID_PHOTO","INVALID PHOTO","","",""))
+          ORDER BY RANDOM() LIMIT 1""".read[Photo]).headOption.getOrElse(Photo("INVALID_PHOTO","INVALID PHOTO","","",""))
       cask.Response(
         s"""
         {
@@ -144,8 +140,7 @@ object PhotoprismSlideshowApp extends cask.MainRoutes{
         }
         """,
         headers = Seq("Content-Type" -> "application/json")
-      )
-    }
+      )    
   }
 
   @cask.get(s"$basePath/random/:categories")
@@ -156,8 +151,8 @@ object PhotoprismSlideshowApp extends cask.MainRoutes{
     val input = (0 to 4).map(i => categoriesList.lift(i).getOrElse("TO_BE_IGNORED"))
     
     
-    sq.transaction(ds){
-      val photo = sq.read[Photo](sql"""
+    ds.transaction:
+      val photo = (sql"""
           select p.photo_uid, p.photo_title, p.photo_type, f.file_hash, p.taken_at
           from files f
           INNER JOIN photos p ON p.photo_uid = f.photo_uid
@@ -166,7 +161,7 @@ object PhotoprismSlideshowApp extends cask.MainRoutes{
           WHERE a.album_type = 'album' 
           AND a.album_category IN (${input(0)}, ${input(1)}, ${input(2)}, ${input(3)}, ${input(4)}) 
           AND p.photo_type = 'image'        
-          ORDER BY RANDOM() LIMIT 1""").headOption.getOrElse(Photo("INVALID_PHOTO","INVALID PHOTO","","",""))
+          ORDER BY RANDOM() LIMIT 1""".read[Photo]).headOption.getOrElse(Photo("INVALID_PHOTO","INVALID PHOTO","","",""))
       cask.Response(
         doctype("html")(
           html(
@@ -202,7 +197,6 @@ object PhotoprismSlideshowApp extends cask.MainRoutes{
         ),
         headers = Seq("Content-Type" -> "text/html; charset=UTF-8")
       )
-    }
   }
 
   override def debugMode = true

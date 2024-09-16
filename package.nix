@@ -4,9 +4,9 @@ sbt.lib.mkSbtDerivation {
   inherit pkgs;
 
   pname = "photoprism-slideshow";
-  version = "0.1.1";
+  version = "0.2.0";
 
-  depsSha256 = "sha256-qwtUYKy51TFA/q/Yd2bwzrPSkA/Xjrsbb8ftQf/0PlM=";
+  depsSha256 = "sha256-SdrAk1e0YN5yWEpx0j9lflNbjuxf2damPKXb/yM6erc=";
   
   buildInputs = [ ];
   src = self;
@@ -19,7 +19,7 @@ sbt.lib.mkSbtDerivation {
   startScript = ''
     #!${pkgs.runtimeShell}
 
-    exec ${pkgs.openjdk_headless}/bin/java ''${JAVA_OPTS:-} -cp "${
+    exec ${pkgs.jdk22_headless}/bin/java ''${JAVA_OPTS:-} -cp "${
       placeholder "out"
     }/share/photoprism-slideshow/lib/*" photoprism.slideshow.PhotoprismSlideshowApp "$@"
   '';
