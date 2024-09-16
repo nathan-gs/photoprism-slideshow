@@ -4,7 +4,7 @@ sbt.lib.mkSbtDerivation {
   inherit pkgs;
 
   pname = "photoprism-slideshow";
-  version = "0.2.0";
+  version = "0.2.1";
 
   depsSha256 = "sha256-SdrAk1e0YN5yWEpx0j9lflNbjuxf2damPKXb/yM6erc=";
   

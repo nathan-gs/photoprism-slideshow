@@ -11,6 +11,12 @@ object PhotoprismSlideshowApp extends cask.MainRoutes{
   val basePath = scala.util.Properties.envOrElse("BASE_PATH", "")
   val interval = scala.util.Properties.envOrElse("INTERVAL", "10").toInt
   val photoprismUrl = scala.util.Properties.envOrElse("PHOTOPRISM_URL", "")
+  val sqlRandomFunction = {
+    if (dsn.contains("mysql"))
+      "RAND()"
+    else
+      "RANDOM()"
+  }
 
   val ds = sq.DataSource.pooled(dsn)
 
@@ -117,7 +123,7 @@ object PhotoprismSlideshowApp extends cask.MainRoutes{
     
     // Ugly hack for IN condition
     val categoriesList = categories.split(",").map(_.trim).filter(_.nonEmpty).toList
-    val input = (0 to 4).map(i => categoriesList.lift(i).getOrElse("TO_BE_IGNORED"))
+    val input = (0 to 6).map(i => categoriesList.lift(i).getOrElse("TO_BE_IGNORED"))
     
     
     ds.transaction:
@@ -128,9 +134,9 @@ object PhotoprismSlideshowApp extends cask.MainRoutes{
           INNER JOIN photos_albums pa ON pa.photo_uid = p.photo_uid
           INNER JOIN albums a ON a.album_uid = pa.album_uid
           WHERE a.album_type = 'album' 
-          AND a.album_category IN (${input(0)}, ${input(1)}, ${input(2)}, ${input(3)}, ${input(4)}) 
+          AND a.album_category IN (${input(0)}, ${input(1)}, ${input(2)}, ${input(3)}, ${input(4)}, ${input(5)}, ${input(6)}) 
           AND p.photo_type = 'image'        
-          ORDER BY RANDOM() LIMIT 1""".read[Photo]).headOption.getOrElse(Photo("INVALID_PHOTO","INVALID PHOTO","","",""))
+          ORDER BY ${sqlRandomFunction} LIMIT 1""".read[Photo]).headOption.getOrElse(Photo("INVALID_PHOTO","INVALID PHOTO","","",""))
       cask.Response(
         s"""
         {
@@ -148,7 +154,7 @@ object PhotoprismSlideshowApp extends cask.MainRoutes{
     
     // Ugly hack for IN condition
     val categoriesList = categories.split(",").map(_.trim).filter(_.nonEmpty).toList
-    val input = (0 to 4).map(i => categoriesList.lift(i).getOrElse("TO_BE_IGNORED"))
+    val input = (0 to 6).map(i => categoriesList.lift(i).getOrElse("TO_BE_IGNORED"))
     
     
     ds.transaction:
@@ -159,9 +165,9 @@ object PhotoprismSlideshowApp extends cask.MainRoutes{
           INNER JOIN photos_albums pa ON pa.photo_uid = p.photo_uid
           INNER JOIN albums a ON a.album_uid = pa.album_uid
           WHERE a.album_type = 'album' 
-          AND a.album_category IN (${input(0)}, ${input(1)}, ${input(2)}, ${input(3)}, ${input(4)}) 
+          AND a.album_category IN (${input(0)}, ${input(1)}, ${input(2)}, ${input(3)}, ${input(4)}, ${input(5)}, ${input(6)}) 
           AND p.photo_type = 'image'        
-          ORDER BY RANDOM() LIMIT 1""".read[Photo]).headOption.getOrElse(Photo("INVALID_PHOTO","INVALID PHOTO","","",""))
+          ORDER BY ${sqlRandomFunction} LIMIT 1""".read[Photo]).headOption.getOrElse(Photo("INVALID_PHOTO","INVALID PHOTO","","",""))
       cask.Response(
         doctype("html")(
           html(
