@@ -2,6 +2,7 @@ package photoprism.slideshow
 
 import simplesql as sq
 import photoprism.slideshow.domain._
+import java.sql.DriverManager
 import scalatags.Text.all._
 
 
@@ -18,7 +19,7 @@ object PhotoprismSlideshowApp extends cask.MainRoutes{
       "RANDOM()"
   }
 
-  val ds = sq.DataSource.pooled(dsn)
+  val ds = new sq.DataSource(() => sq.Connection(DriverManager.getConnection(dsn)))
 
   @cask.get(s"$basePath")
   def index() = {
@@ -126,7 +127,7 @@ object PhotoprismSlideshowApp extends cask.MainRoutes{
     val input = (0 to 6).map(i => categoriesList.lift(i).getOrElse("TO_BE_IGNORED"))
     
     
-    ds.transaction:
+    ds.run:
       val photo = (sql"""
           select p.photo_uid as uid, p.photo_title as title, p.photo_type, f.file_hash, p.taken_at
           from files f
@@ -157,7 +158,7 @@ object PhotoprismSlideshowApp extends cask.MainRoutes{
     val input = (0 to 6).map(i => categoriesList.lift(i).getOrElse("TO_BE_IGNORED"))
     
     
-    ds.transaction:
+    ds.run:
       val photo = (sql"""
           select p.photo_uid as uid, p.photo_title as title, p.photo_type, f.file_hash, p.taken_at
           from files f
