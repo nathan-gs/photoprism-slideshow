@@ -153,10 +153,7 @@ object PhotoprismSlideshowApp extends cask.MainRoutes{
     
     // Ugly hack for IN condition
     val categoriesList = categories.split(",").map(_.trim).filter(_.nonEmpty).toList
-
-    categoriesList.join(",")
-    
-    
+     
     ds.run:
       val photo = (sql"""
           select p.photo_uid as uid, p.photo_title as title, p.photo_type, f.file_hash, p.taken_at
