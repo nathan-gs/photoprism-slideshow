@@ -19,7 +19,7 @@ sbt.lib.mkSbtDerivation {
   startScript = ''
     #!${pkgs.runtimeShell}
 
-    exec ${pkgs.jre25_minimal}/bin/java ''${JAVA_OPTS:-} -cp "${
+    exec ${pkgs.jdk25_headless}/bin/java ''${JAVA_OPTS:-} -cp "${
       placeholder "out"
     }/share/photoprism-slideshow/lib/*" photoprism.slideshow.PhotoprismSlideshowApp "$@"
   '';
