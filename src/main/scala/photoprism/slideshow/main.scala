@@ -38,14 +38,13 @@ object PhotoprismSlideshowApp extends cask.MainRoutes{
               #photo {
                 background-color: grey;
                 background-position-x: center;
-                background-position-y: top;
+                background-position-y: center;
                 background-repeat: no-repeat;
                 background-attachment: fixed;
-                background-size: auto;
                 background-origin: padding-box;
                 background-clip: border-box;
                 height: 100%;
-                background-size: contain;
+                background-size: cover;
               }  
               #box {
                 position: absolute;
