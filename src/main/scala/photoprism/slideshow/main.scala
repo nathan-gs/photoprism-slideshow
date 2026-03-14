@@ -37,12 +37,8 @@ object PhotoprismSlideshowApp extends cask.MainRoutes{
               }         
               #photo {
                 background-color: grey;
-                background-position-x: center;
-                background-position-y: center;
+                background-position: center center;
                 background-repeat: no-repeat;
-                background-attachment: fixed;
-                background-origin: padding-box;
-                background-clip: border-box;
                 height: 100%;
                 background-size: cover;
               }  
@@ -57,8 +53,7 @@ object PhotoprismSlideshowApp extends cask.MainRoutes{
                 z-index: 1000;
               }   
               """)),
-            meta(name:="viewport", content:="width=device-width, initial-scale=1"),
-            script(src:="https://cdnjs.cloudflare.com/ajax/libs/nosleep/0.12.0/NoSleep.min.js")
+            meta(name:="viewport", content:="width=device-width, initial-scale=1")
           ),
           body(
             div(id:="photo")(
@@ -68,47 +63,54 @@ object PhotoprismSlideshowApp extends cask.MainRoutes{
               )
             ),
             tag("script")(raw(s"""
-              
+              function getAlbum() {
+                try {
+                  var p = new URLSearchParams(location.search);
+                  var a = p.get('albums') || p.get('album');
+                  if (a) return a;
+                } catch(e) {}
+                var hash = location.hash.substr(1);
+                if (hash) return hash;
+                return '';
+              }
+
               function refreshImage() {
-                fetch('./photo/random/' + location.hash.substr(1))
-                .then(function(response) {
-                  if (response.status !== 200) {
-                    console.log('Looks like there was a problem. Status Code: ' + response.status);
+                var album = getAlbum();
+                var xhr = new XMLHttpRequest();
+                xhr.open('GET', './photo/random/' + album, true);
+                xhr.onreadystatechange = function() {
+                  if (xhr.readyState !== 4) return;
+                  if (xhr.status !== 200) {
+                    console.log('Error: ' + xhr.status);
                     return;
                   }
-
-                  // Examine the text in the response
-                  response.json().then(function(data) {
-                    img = new Image()
-                    
+                  try {
+                    var data = JSON.parse(xhr.responseText);
+                    var img = new Image();
                     img.onload = function() {
                       document.getElementById('title').innerText = data.title;
                       document.getElementsByTagName('title')[0].innerText = data.title;
                       document.getElementById('ts').innerText = data.taken_at;
-                      document.getElementById('photo').style.backgroundImage = "url(\\"" + data.photo + "\\")";
-                    }
+                      document.getElementById('photo').style.backgroundImage = 'url("' + data.photo + '")';
+                      if (img.naturalWidth >= img.naturalHeight) {
+                        document.getElementById('photo').style.backgroundSize = '100% auto';
+                      } else {
+                        document.getElementById('photo').style.backgroundSize = 'auto 100%';
+                      }
+                    };
                     img.src = data.photo;
-                  });
-                })
-                .catch(function(err) {
-                  console.log('Fetch Error :-S', err);
-                });
+                  } catch(e) {
+                    console.log('Parse error: ' + e);
+                  }
+                };
+                xhr.send();
               }
-              var intervalID = window.setInterval(refreshImage, ${interval} * 1000);
-              refreshImage();
 
-              var noSleep = new NoSleep();
-              document.addEventListener('click', function enableNoSleepAndFullScreen() {
-                //document.removeEventListener('click', enableNoSleep, false);
-                noSleep.enable();
-                function requestFullScreen(element) {
-                  var requestMethod = element.requestFullScreen || element.webkitRequestFullScreen || element.mozRequestFullScreen || element.msRequestFullScreen;                
-                  requestMethod.call(element);                
-                }
-                requestFullScreen(document.body);
-              }, false);
+              window.addEventListener('load', function() {
+                refreshImage();
+                setInterval(refreshImage, ${interval} * 1000);
+              });
             """))
-            
           )
         )
       ),
